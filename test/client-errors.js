@@ -235,3 +235,29 @@ test('POST with chunked encoding that errors and pipelining 1 should reconnect',
     })
   })
 })
+
+// THIS IS A FAILING TEST, SKIP FOR NOW
+test('emits error when maxRetries is reached', { skip: true }, (t) => {
+  const maxRetries = 3
+
+  t.plan(1 + (3 * maxRetries))
+
+  // nothing is listening, so client[kReconnects] should exceed maxRetries
+  const client = new Client('http://localhost:12345', {
+    pipelining: 1,
+    maxRetries
+  })
+  t.tearDown(client.close.bind(client))
+
+  client.on('maxRetriesExceeded', (err) => {
+    t.ok(err instanceof Error)
+  })
+
+  for (let i = 0; i < maxRetries; i++) {
+    client.request({ path: '/', method: 'GET' }, (err, data) => {
+      t.ok(err instanceof Error) // we are expecting an error
+      t.strictEqual(null, data)
+      t.strictEqual(err.code, 'ECONNREFUSED')
+    })
+  }
+})

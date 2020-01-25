@@ -39,6 +39,9 @@ Options:
   single TCP/TLS connection according to
   [RFC7230](https://tools.ietf.org/html/rfc7230#section-6.3.2). Default: `1`.
 
+- `maxRetries`, the maximum number of subsequent attempts to retry
+  connecting. Once reached the client will emit an error. Default: `null`.
+
 <a name='request'></a>
 #### `client.request(opts, cb(err, data))`
 
